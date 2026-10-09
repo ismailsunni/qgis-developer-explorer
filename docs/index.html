@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QGIS Developer Explorer</title>
+<meta name="description" content="Every pull request to qgis/QGIS: who opens, merges, reviews and discusses them, and how that has changed over the years.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>🧑‍💻</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-inner">
+    <div>
+      <h1>QGIS <span>developer explorer</span></h1>
+      <p class="sub" id="subtitle">Loading pull requests…</p>
+    </div>
+    <div class="top-controls">
+      <button id="theme" class="ghost" title="Switch theme" aria-label="Switch theme">◐</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="app" hidden>
+  <section class="tiles" id="tiles"></section>
+
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <h2>Activity over time</h2>
+        <p class="hint">Monthly volume with a 12-month average. Drag across the chart to filter every section below to that period.</p>
+      </div>
+      <div class="seg" id="metric" role="group" aria-label="Metric">
+        <button data-v="o" class="on">Opened</button>
+        <button data-v="mg">Merged</button>
+        <button data-v="cl">Closed</button>
+        <button data-v="p">Authors</button>
+        <button data-v="cm">Comments</button>
+      </div>
+    </div>
+    <div class="chart" id="timeline"></div>
+    <div class="filterbar">
+      <label>From <select id="y0"></select></label>
+      <label>To <select id="y1"></select></label>
+      <span class="presets" id="presets"></span>
+      <label class="check"><input type="checkbox" id="marks" checked> Releases</label>
+      <label class="check"><input type="checkbox" id="bots" checked> Hide bots</label>
+      <span class="range-note" id="rangeNote"></span>
+    </div>
+  </section>
+
+  <section class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Most active developers</h2>
+          <p class="hint">In the selected period. Reviews count PRs reviewed, not review events.</p>
+        </div>
+        <div class="seg" id="topMetric" role="group" aria-label="Rank by">
+          <button data-v="0" class="on">PRs</button>
+          <button data-v="1">Merged</button>
+          <button data-v="3">Comments</button>
+          <button data-v="4">Reviews</button>
+          <button data-v="6">Merges</button>
+        </div>
+      </div>
+      <div class="chart" id="peopleChart"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div>
+        <h2>PRs per author</h2>
+        <p class="hint">How many people opened how many pull requests. Open-source contribution is
+          lopsided by nature; this is the shape of it.</p>
+      </div></div>
+      <div class="chart" id="histogram"></div>
+      <p class="note" id="histNote"></p>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <h2>Developer table</h2>
+        <p class="hint">Click a column to sort. Counts follow the selected period; time to merge, lines changed
+          and the span are all-time. The spark column shows PRs opened per year.</p>
+      </div>
+      <input id="search" type="search" placeholder="Search GitHub login…" aria-label="Search people">
+    </div>
+    <div class="scroll"><table id="peopleTable" class="data"></table></div>
+    <button class="more" id="peopleMore" hidden></button>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <h2>Who works with whom</h2>
+        <p class="hint">The 80 most connected people, joined when one comments on or reviews the other's PR.
+          Node size is interactions in the period; line weight is PRs shared.</p>
+      </div>
+      <div class="graph-ctl">
+        <label class="check">Min. shared PRs
+          <input type="range" id="minEdge" min="1" max="60" value="10">
+          <b id="minEdgeVal">10</b>
+        </label>
+        <button class="ghost wide" id="graphReset" title="Unpin every node and re-run the layout">Reset</button>
+      </div>
+    </div>
+    <div class="chart" id="graph"></div>
+    <p class="note" id="graphNote"></p>
+  </section>
+
+  <section class="grid-2">
+    <div class="card">
+      <div class="card-head"><div>
+        <h2>Time to merge</h2>
+        <p class="hint">Days from opening to merge, by year merged. The bar spans the middle half of PRs; the dot is the median.</p>
+      </div></div>
+      <div class="chart" id="ttm"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div>
+        <h2>How PRs end</h2>
+        <p class="hint">PRs merged and closed without merging each year, by the date they were resolved.</p>
+      </div></div>
+      <div class="chart" id="outcomes"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div>
+        <h2>Notable pull requests</h2>
+        <p class="hint">The most discussed, most reviewed, longest running and largest PRs. Click a column to sort;
+          titles link to GitHub.</p>
+      </div>
+      <select id="prState" aria-label="Filter by state">
+        <option value="">Any state</option><option>merged</option><option>closed</option><option>open</option><option>draft</option>
+      </select>
+    </div>
+    <div class="scroll"><table id="prTable" class="data"></table></div>
+    <button class="more" id="prMore" hidden></button>
+  </section>
+
+  <section class="grid-2">
+    <div class="card">
+      <div class="card-head"><div>
+        <h2>When PRs are opened</h2>
+        <p class="hint">By weekday and hour in UTC — GitHub does not record the author's time zone.</p>
+      </div></div>
+      <div class="chart" id="heatmap"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div>
+        <h2>Newcomers and regulars</h2>
+        <p class="hint">People opening their first PR each year, against those who also opened one the year before.</p>
+      </div></div>
+      <div class="chart" id="churn"></div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p>Source: <a href="https://github.com/qgis/QGIS/pulls">github.com/qgis/QGIS</a> pull requests, via the GitHub GraphQL API.
+      Comments are conversation comments; inline code-review comments are counted as part of a review. <span id="gen"></span></p>
+    <p>Only public GitHub logins and activity counts are shown. To be removed,
+      <a href="https://github.com/ismailsunni/qgis-developer-explorer/issues/new">open an issue</a>.
+      Built with <a href="https://github.com/ismailsunni/qgis-developer-explorer">qgis-developer-explorer</a>.</p>
+  </footer>
+</main>
+
+<div id="tip" class="tip" hidden></div>
+<script src="vendor/d3-force.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
