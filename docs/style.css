@@ -159,3 +159,4 @@ td.subj { max-width: 46ch; overflow: hidden; text-overflow: ellipsis; }
 .pill.merged { background: color-mix(in srgb, var(--s7) 18%, transparent); color: var(--s7); }
 .pill.open { background: color-mix(in srgb, var(--s3) 18%, transparent); color: var(--s3); }
 .pill.closed { background: color-mix(in srgb, var(--s8) 16%, transparent); color: var(--s8); }
+.ai { color: var(--muted); font-size: 11px; cursor: help; }
