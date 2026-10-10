@@ -57,8 +57,8 @@
           <p class="hint">In the selected period. Reviews count PRs reviewed, not review events.</p>
         </div>
         <div class="seg" id="topMetric" role="group" aria-label="Rank by">
-          <button data-v="0" class="on">PRs</button>
-          <button data-v="1">Merged</button>
+          <button data-v="0">PRs</button>
+          <button data-v="1" class="on">Merged</button>
           <button data-v="3">Comments</button>
           <button data-v="4">Reviews</button>
           <button data-v="6">Merges</button>
@@ -82,8 +82,13 @@
       <div>
         <h2>Developer table</h2>
         <p class="hint">Click a column to sort. Counts follow the selected period; time to merge, lines changed
-          and the span are all-time. The spark column shows PRs opened per year.</p>
+          and the span are all-time. The spark column shows PRs opened per year.
+          <span class="ai">✦</span> marks developers with at least <b id="aiMinNote">10</b> merged PRs of all time.</p>
       </div>
+      <label class="check">✦ min. merged
+        <input type="range" id="aiMin" min="1" max="200" value="10">
+        <b id="aiMinVal">10</b>
+      </label>
       <input id="search" type="search" placeholder="Search GitHub login…" aria-label="Search people">
     </div>
     <div class="scroll"><table id="peopleTable" class="data"></table></div>
@@ -109,7 +114,14 @@
     <p class="note" id="graphNote"></p>
   </section>
 
-  <section class="grid-2">
+  <section class="grid-2 three">
+    <div class="card">
+      <div class="card-head"><div>
+        <h2>PR states</h2>
+        <p class="hint">PRs opened in the selected period, by where they stand now.</p>
+      </div></div>
+      <div class="chart" id="states"></div>
+    </div>
     <div class="card">
       <div class="card-head"><div>
         <h2>Time to merge</h2>

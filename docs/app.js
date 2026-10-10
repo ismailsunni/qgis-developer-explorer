@@ -19,9 +19,9 @@ const MILESTONES = [
 const METRIC = { o: "PRs opened", mg: "PRs merged", cl: "PRs closed unmerged", p: "PR authors", cm: "comments" };
 const TOP = { 0: "PRs opened", 1: "PRs merged", 3: "comments", 4: "PRs reviewed", 6: "PRs merged by them" };
 
-let D, state = { y0: 0, y1: 0, metric: "o", top: 0, peopleSort: { k: "o", desc: true },
+let D, state = { y0: 0, y1: 0, metric: "o", top: 1, peopleSort: { k: "mg", desc: true },
                  prSort: { k: "cm", desc: true }, q: "", prState: "", hideBots: true, marks: true,
-                 minEdge: 10, limit: 25, plimit: 20 };
+                 minEdge: 10, aiMin: 10, limit: 25, plimit: 20 };
 
 /** A bar whose data-end is rounded and whose baseline end is square. */
 const barPath = (x, y, w, h, r = 4) => {
@@ -70,8 +70,8 @@ const spanLabel = d => d >= 365
 const dayLabel = d => d < 1 ? `${Math.round(d * 24)}h` : d < 10 ? `${d.toFixed(1)}d` : `${Math.round(d)}d`;
 const people = () => D.people.filter(a => !(state.hideBots && a.bot));
 const V = () => D[state.hideBots ? "humans" : "all"];
-/** 100+ merged PRs over all time (not just the selected period): allowed to use AI. */
-const aiOk = a => Object.values(a.years).reduce((s, y) => s + y[MG], 0) >= 100;
+/** state.aiMin+ merged PRs over all time (not just the selected period): allowed to use AI. */
+const aiOk = a => Object.values(a.years).reduce((s, y) => s + y[MG], 0) >= state.aiMin;
 
 /** Sum one counter of a person's yearly arrays over the selected period. */
 const tally = (years, i) => {
@@ -358,6 +358,31 @@ function renderOutcomes() {
     <span><i style="background:var(--s8)"></i>closed without merging</span></div>`);
 }
 
+/* ------------------------------------------------------ states (donut) */
+function renderStates() {
+  const host = $("#states"), ppl = people();
+  const t = i => ppl.reduce((s, a) => s + tally(a.years, i), 0);
+  const [o, mg, cl] = [t(O), t(MG), t(CL)];
+  if (!o) return empty(host, "No PRs in this period.");
+  const parts = [["merged", mg, "var(--s7)"], ["closed without merging", cl, "var(--s8)"], ["open", o - mg - cl, "var(--s3)"]];
+  const H = 230, [svg, W] = root(host, H), cx = W / 2, cy = H / 2, R = H / 2 - 8, r = R * .6;
+  let a0 = -Math.PI / 2;
+  for (const [k, v, c] of parts) {
+    if (!v) continue;
+    const a1 = a0 + Math.min(v / o, .99999) * Math.PI * 2, big = a1 - a0 > Math.PI ? 1 : 0;
+    const pt = (rad, a) => `${cx + rad * Math.cos(a)},${cy + rad * Math.sin(a)}`;
+    const seg = el("path", { d: `M${pt(R, a0)}A${R},${R} 0 ${big} 1 ${pt(R, a1)}L${pt(r, a1)}A${r},${r} 0 ${big} 0 ${pt(r, a0)}Z`,
+      fill: c, stroke: "var(--surface)", "stroke-width": 2 });
+    hover(seg, () => `<b>${fmt(v)}</b> ${k}<br><span class="k">${(v / o * 100).toFixed(1)}% of ${fmt(o)} PRs opened</span>`);
+    svg.appendChild(seg);
+    a0 = a1;
+  }
+  svg.appendChild(text(cx, cy + 2, fmt(o), { "text-anchor": "middle", "font-size": 20, "font-weight": 640, fill: "var(--ink)" }));
+  svg.appendChild(text(cx, cy + 18, "PRs opened", { "text-anchor": "middle" }));
+  host.insertAdjacentHTML("beforeend", `<div class="legend">${parts.map(([k, v, c]) =>
+    `<span><i style="background:${c}"></i>${k} ${Math.round(v / o * 100)}%</span>`).join("")}</div>`);
+}
+
 /* --------------------------------------------------------- heatmap */
 function renderHeatmap() {
   const host = $("#heatmap");
@@ -588,7 +613,7 @@ function renderPeopleTable() {
   const cols = [
     ["rank", "#", r => r.rank, "num dim"],
     ["name", "Developer", r => `<a href="${GH}${esc(r.name)}" target="_blank" rel="noopener">${esc(r.name)}</a>${
-      aiOk(r) ? ' <span class="ai" title="100+ merged PRs: allowed to use AI">✦</span>' : ""}`, "l"],
+      aiOk(r) ? ` <span class="ai" title="${state.aiMin}+ merged PRs: allowed to use AI">✦</span>` : ""}`, "l"],
     ["o", "PRs", r => fmt(r.o), "num"],
     ["mg", "Merged", r => fmt(r.mg), "num"],
     ["cl", "Closed", r => fmt(r.cl), "num"],
@@ -655,7 +680,7 @@ function renderAll() {
   const yrs = V().yearly.filter(y => inRange(y.y));
   $("#rangeNote").textContent =
     `${fmt(yrs.reduce((a, y) => a + y.o, 0))} PRs in ${state.y1 - state.y0 + 1} year${state.y1 > state.y0 ? "s" : ""}`;
-  renderTiles(); renderTimeline(); renderPeopleChart(); renderHistogram(); renderTtm(); renderOutcomes();
+  renderTiles(); renderTimeline(); renderPeopleChart(); renderHistogram(); renderStates(); renderTtm(); renderOutcomes();
   renderHeatmap(); renderChurn(); renderGraph(); renderPeopleTable(); renderPrTable();
 }
 
@@ -690,6 +715,11 @@ function boot(data) {
   on("#prState", "onchange", e => { state.prState = e.target.value; state.plimit = 20; renderPrTable(); });
   on("#bots", "onchange", e => { state.hideBots = e.target.checked; renderAll(); });
   on("#marks", "onchange", e => { state.marks = e.target.checked; renderTimeline(); });
+  on("#aiMin", "oninput", e => {
+    state.aiMin = +e.target.value;
+    $("#aiMinVal").textContent = $("#aiMinNote").textContent = state.aiMin;
+    renderPeopleTable();
+  });
   on("#minEdge", "oninput", e => { state.minEdge = +e.target.value; $("#minEdgeVal").textContent = state.minEdge; renderGraph(); });
   $("#app").hidden = false;
   renderAll();
