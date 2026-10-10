@@ -123,11 +123,21 @@ h2 { font-size: 15px; margin: 0; font-weight: 620; }
 
 input[type="range"] { width: 130px; accent-color: var(--s1); }
 .dual { position: relative; width: 220px; height: 20px; }
-.dual input { position: absolute; inset: 0; width: 100%; margin: 0; pointer-events: none; background: none; }
-.dual input::-webkit-slider-thumb { pointer-events: auto; }
-.dual input::-moz-range-thumb { pointer-events: auto; }
-.dual input + input::-webkit-slider-runnable-track { background: none; }
-.dual input + input::-moz-range-track { background: none; }
+.dual::before {
+  content: ""; position: absolute; left: 7px; right: 7px; top: 8px; height: 4px; border-radius: 2px;
+  background: linear-gradient(to right, var(--grid) var(--a), var(--s1) var(--a) var(--b), var(--grid) var(--b));
+}
+.dual input { position: absolute; inset: 0; width: 100%; margin: 0; pointer-events: none; background: none; appearance: none; -webkit-appearance: none; }
+.dual input::-webkit-slider-runnable-track { background: none; height: 20px; }
+.dual input::-moz-range-track, .dual input::-moz-range-progress { background: none; }
+.dual input::-webkit-slider-thumb {
+  -webkit-appearance: none; pointer-events: auto; cursor: pointer; margin-top: 3px; box-sizing: border-box;
+  width: 14px; height: 14px; border-radius: 50%; background: var(--s1); border: 2px solid var(--surface);
+}
+.dual input::-moz-range-thumb {
+  pointer-events: auto; cursor: pointer;
+  width: 10px; height: 10px; border-radius: 50%; background: var(--s1); border: 2px solid var(--surface);
+}
 
 .note { margin: 10px 0 0; color: var(--ink-2); font-size: 12.5px; }
 .note b { font-weight: 620; color: var(--ink); }
@@ -167,4 +177,5 @@ td.subj { max-width: 46ch; overflow: hidden; text-overflow: ellipsis; }
 .pill.merged { background: color-mix(in srgb, var(--s7) 18%, transparent); color: var(--s7); }
 .pill.open { background: color-mix(in srgb, var(--s3) 18%, transparent); color: var(--s3); }
 .pill.closed { background: color-mix(in srgb, var(--s8) 16%, transparent); color: var(--s8); }
-.ai { color: var(--muted); font-size: 11px; cursor: help; }
+.ai { color: var(--s4); font-size: 11px; cursor: help; }
+a.star { font-weight: 620; color: var(--s7); }

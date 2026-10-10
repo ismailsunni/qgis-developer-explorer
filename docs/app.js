@@ -70,8 +70,6 @@ const spanLabel = d => d >= 365
 const dayLabel = d => d < 1 ? `${Math.round(d * 24)}h` : d < 10 ? `${d.toFixed(1)}d` : `${Math.round(d)}d`;
 const people = () => D.people.filter(a => !(state.hideBots && a.bot));
 const V = () => D[state.hideBots ? "humans" : "all"];
-/** state.aiMin+ merged PRs over all time (not just the selected period): allowed to use AI. */
-const aiOk = a => Object.values(a.years).reduce((s, y) => s + y[MG], 0) >= state.aiMin;
 
 /** Sum one counter of a person's yearly arrays over the selected period. */
 const tally = (years, i) => {
@@ -612,8 +610,10 @@ function renderPeopleTable() {
   const pct = r => r.mg + r.cl ? Math.round(r.mg / (r.mg + r.cl) * 100) + "%" : "—";
   const cols = [
     ["rank", "#", r => r.rank, "num dim"],
-    ["name", "Developer", r => `<a href="${GH}${esc(r.name)}" target="_blank" rel="noopener">${esc(r.name)}</a>${
-      aiOk(r) ? ` <span class="ai" title="${state.aiMin}+ merged PRs: allowed to use AI">✦</span>` : ""}`, "l"],
+    ["name", "Developer", r => r.mg >= state.aiMin
+      ? `<a class="star" href="${GH}${esc(r.name)}" target="_blank" rel="noopener">${esc(r.name)}</a> <span class="ai" title="${
+        state.aiMin}+ merged PRs: allowed to use AI">✦</span>`
+      : `<a href="${GH}${esc(r.name)}" target="_blank" rel="noopener">${esc(r.name)}</a>`, "l"],
     ["o", "PRs", r => fmt(r.o), "num"],
     ["mg", "Merged", r => fmt(r.mg), "num"],
     ["cl", "Closed", r => fmt(r.cl), "num"],
@@ -678,6 +678,8 @@ function setRange(a, b) {
 
 function renderAll() {
   const yrs = V().yearly.filter(y => inRange(y.y));
+  const pct = y => (y - D.years[0]) / Math.max(1, D.years.at(-1) - D.years[0]) * 100 + "%";
+  $(".dual").style.cssText = `--a:${pct(state.y0)};--b:${pct(state.y1)}`;
   const authors = people().filter(a => tally(a.years, O)).length;
   $("#rangeNote").textContent = `${fmt(yrs.reduce((a, y) => a + y.o, 0))} PRs by ${fmt(authors)} people in ` +
     `${state.y0 === state.y1 ? state.y0 : `${state.y0}–${state.y1}`}`;
