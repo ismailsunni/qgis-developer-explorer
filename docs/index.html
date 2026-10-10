@@ -7,6 +7,7 @@
 <meta name="description" content="Every pull request to qgis/QGIS: who opens, merges, reviews and discusses them, and how that has changed over the years.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>🧑‍💻</text></svg>">
 <link rel="stylesheet" href="style.css">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="a4e2f8be-91ae-48a3-a1ba-0b50d7485e05"></script>
 </head>
 <body>
 <header class="top">
@@ -41,6 +42,9 @@
     <div class="chart" id="timeline"></div>
     <div class="filterbar">
       <label>From <select id="y0"></select></label>
+      <span class="dual" title="Drag either end to set the period">
+        <input type="range" id="r0" aria-label="Start year"><input type="range" id="r1" aria-label="End year">
+      </span>
       <label>To <select id="y1"></select></label>
       <span class="presets" id="presets"></span>
       <label class="check"><input type="checkbox" id="marks" checked> Releases</label>

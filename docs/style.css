@@ -122,6 +122,12 @@ h2 { font-size: 15px; margin: 0; font-weight: 620; }
 #graph svg { touch-action: none; }
 
 input[type="range"] { width: 130px; accent-color: var(--s1); }
+.dual { position: relative; width: 220px; height: 20px; }
+.dual input { position: absolute; inset: 0; width: 100%; margin: 0; pointer-events: none; background: none; }
+.dual input::-webkit-slider-thumb { pointer-events: auto; }
+.dual input::-moz-range-thumb { pointer-events: auto; }
+.dual input + input::-webkit-slider-runnable-track { background: none; }
+.dual input + input::-moz-range-track { background: none; }
 
 .note { margin: 10px 0 0; color: var(--ink-2); font-size: 12.5px; }
 .note b { font-weight: 620; color: var(--ink); }

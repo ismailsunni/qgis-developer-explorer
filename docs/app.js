@@ -672,14 +672,15 @@ function renderPrTable() {
 function setRange(a, b) {
   state.y0 = Math.max(D.years[0], Math.min(a, b));
   state.y1 = Math.min(D.years.at(-1), Math.max(a, b));
-  $("#y0").value = state.y0; $("#y1").value = state.y1;
+  $("#y0").value = $("#r0").value = state.y0; $("#y1").value = $("#r1").value = state.y1;
   renderAll();
 }
 
 function renderAll() {
   const yrs = V().yearly.filter(y => inRange(y.y));
-  $("#rangeNote").textContent =
-    `${fmt(yrs.reduce((a, y) => a + y.o, 0))} PRs in ${state.y1 - state.y0 + 1} year${state.y1 > state.y0 ? "s" : ""}`;
+  const authors = people().filter(a => tally(a.years, O)).length;
+  $("#rangeNote").textContent = `${fmt(yrs.reduce((a, y) => a + y.o, 0))} PRs by ${fmt(authors)} people in ` +
+    `${state.y0 === state.y1 ? state.y0 : `${state.y0}–${state.y1}`}`;
   renderTiles(); renderTimeline(); renderPeopleChart(); renderHistogram(); renderStates(); renderTtm(); renderOutcomes();
   renderHeatmap(); renderChurn(); renderGraph(); renderPeopleTable(); renderPrTable();
 }
@@ -701,6 +702,10 @@ function boot(data) {
     $("#" + id).innerHTML = D.years.map(y => `<option>${y}</option>`).join("");
     $("#" + id).value = state[id];
     on("#" + id, "onchange", () => setRange(+$("#y0").value, +$("#y1").value));
+  }
+  for (const id of ["r0", "r1"]) {
+    Object.assign($("#" + id), { min: D.years[0], max: D.years.at(-1), value: state[id.replace("r", "y")] });
+    on("#" + id, "oninput", () => setRange(+$("#r0").value, +$("#r1").value));
   }
   const last = D.years.at(-1);
   const presets = [["All", D.years[0], last], ["Last 5 years", last - 4, last], ["Since 3.0", 2018, last],
