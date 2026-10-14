@@ -21,7 +21,7 @@ const TOP = { 0: "PRs opened", 1: "PRs merged", 3: "comments", 4: "PRs reviewed"
 
 let D, state = { y0: 0, y1: 0, metric: "o", top: 1, peopleSort: { k: "mg", desc: true },
                  prSort: { k: "cm", desc: true }, q: "", prState: "", hideBots: true, marks: true,
-                 minEdge: 10, aiMin: 10, limit: 25, plimit: 20 };
+                 minEdge: 10, aiMin: 100, limit: 25, plimit: 20 };
 
 /** A bar whose data-end is rounded and whose baseline end is square. */
 const barPath = (x, y, w, h, r = 4) => {
