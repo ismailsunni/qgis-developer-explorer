@@ -35,10 +35,13 @@ jobs:
           path: raw
           key: raw-prs-${{ github.run_id }}
           restore-keys: raw-prs-
-      - run: ./scripts/update.sh
+      # a push only changes the site, so it reuses the cached mirror unless the cache is cold
+      - run: python3 scripts/fetch.py
+        if: github.event_name != 'push' || hashFiles('raw/prs.json') == ''
         env:
           # an optional personal token makes a cold-cache backfill much faster
           GITHUB_TOKEN: ${{ secrets.GH_PAT || github.token }}
+      - run: python3 scripts/build.py
       - run: python3 scripts/stamp.py
       - uses: actions/upload-pages-artifact@v3
         with:
