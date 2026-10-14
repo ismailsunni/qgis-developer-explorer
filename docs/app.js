@@ -640,7 +640,8 @@ function renderPeopleTable() {
     return r;
   }).filter(r => r.o + r.cm + r.rv + r.mr > 0);
   const stars = rows.filter(r => r.mg >= state.aiMin).length;
-  $("#aiNote").innerHTML = `<b>${fmt(stars)}</b> ✦ developers with at least <b>${fmt(state.aiMin)}</b> merged PRs in ${period()}.`;
+  $("#aiNote").innerHTML = `<b>${fmt(stars)}</b> ✦ developers with at least <b>${fmt(state.aiMin)}</b> merged PRs in <b>${period()}</b>.`;
+  $("#aiPeriod").textContent = period();
   if (state.q) rows = rows.filter(a => a.name.toLowerCase().includes(state.q.toLowerCase()));
   const body = table("#peopleTable", cols, rows, state.peopleSort, renderPeopleTable);
   const shown = rows.slice(0, state.limit);

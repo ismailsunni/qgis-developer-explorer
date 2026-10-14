@@ -99,7 +99,7 @@ h2 { font-size: 15px; margin: 0; font-weight: 620; }
   border: 1px solid var(--border); border-radius: 7px; padding: 5px 8px;
 }
 #search { min-width: 220px; }
-#aiMinNum { width: 6ch; padding: 3px 6px; }
+#aiMinNum { width: 10ch; field-sizing: content; min-width: 7ch; padding: 3px 6px; }
 #prState { font: inherit; font-size: 12.5px; background: var(--surface); color: var(--ink);
   border: 1px solid var(--border); border-radius: 7px; padding: 6px 8px; }
 .presets { display: inline-flex; gap: 6px; flex-wrap: wrap; }
