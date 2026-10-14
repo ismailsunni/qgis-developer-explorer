@@ -639,6 +639,8 @@ function renderPeopleTable() {
     r.rate = r.mg + r.cl ? r.mg / (r.mg + r.cl) : null;
     return r;
   }).filter(r => r.o + r.cm + r.rv + r.mr > 0);
+  const stars = rows.filter(r => r.mg >= state.aiMin).length;
+  $("#aiNote").innerHTML = `<b>${fmt(stars)}</b> ✦ developers with at least <b>${fmt(state.aiMin)}</b> merged PRs in ${period()}.`;
   if (state.q) rows = rows.filter(a => a.name.toLowerCase().includes(state.q.toLowerCase()));
   const body = table("#peopleTable", cols, rows, state.peopleSort, renderPeopleTable);
   const shown = rows.slice(0, state.limit);
@@ -676,13 +678,14 @@ function setRange(a, b) {
   renderAll();
 }
 
+const period = () => state.y0 === state.y1 ? `${state.y0}` : `${state.y0}–${state.y1}`;
+
 function renderAll() {
   const yrs = V().yearly.filter(y => inRange(y.y));
   const pct = y => (y - D.years[0]) / Math.max(1, D.years.at(-1) - D.years[0]) * 100 + "%";
   $(".dual").style.cssText = `--a:${pct(state.y0)};--b:${pct(state.y1)}`;
   const authors = people().filter(a => tally(a.years, O)).length;
-  $("#rangeNote").textContent = `${fmt(yrs.reduce((a, y) => a + y.o, 0))} PRs by ${fmt(authors)} people in ` +
-    `${state.y0 === state.y1 ? state.y0 : `${state.y0}–${state.y1}`}`;
+  $("#rangeNote").textContent = `${fmt(yrs.reduce((a, y) => a + y.o, 0))} PRs by ${fmt(authors)} people in ${period()}`;
   renderTiles(); renderTimeline(); renderPeopleChart(); renderHistogram(); renderStates(); renderTtm(); renderOutcomes();
   renderHeatmap(); renderChurn(); renderGraph(); renderPeopleTable(); renderPrTable();
 }
@@ -722,11 +725,17 @@ function boot(data) {
   on("#prState", "onchange", e => { state.prState = e.target.value; state.plimit = 20; renderPrTable(); });
   on("#bots", "onchange", e => { state.hideBots = e.target.checked; renderAll(); });
   on("#marks", "onchange", e => { state.marks = e.target.checked; renderTimeline(); });
-  on("#aiMin", "oninput", e => {
-    state.aiMin = +e.target.value;
-    $("#aiMinVal").textContent = $("#aiMinNote").textContent = state.aiMin;
+  const setAiMin = e => {
+    const v = Math.round(+e.target.value);
+    if (!(v >= 1)) return;
+    state.aiMin = v;
+    if (e.target.id !== "aiMinNum") $("#aiMinNum").value = v;
+    if (e.target.id !== "aiMin") $("#aiMin").value = v;
+    $("#aiMinNote").textContent = v;
     renderPeopleTable();
-  });
+  };
+  on("#aiMin", "oninput", setAiMin);
+  on("#aiMinNum", "oninput", setAiMin);
   on("#minEdge", "oninput", e => { state.minEdge = +e.target.value; $("#minEdgeVal").textContent = state.minEdge; renderGraph(); });
   $("#app").hidden = false;
   renderAll();

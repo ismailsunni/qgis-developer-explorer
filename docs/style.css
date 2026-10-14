@@ -94,11 +94,12 @@ h2 { font-size: 15px; margin: 0; font-weight: 620; }
 .seg button.on { background: var(--wash); color: var(--ink); font-weight: 560; }
 
 .filterbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); color: var(--ink-2); font-size: 12.5px; }
-.filterbar select, #search {
+.filterbar select, #search, #aiMinNum {
   font: inherit; background: var(--surface); color: var(--ink);
   border: 1px solid var(--border); border-radius: 7px; padding: 5px 8px;
 }
 #search { min-width: 220px; }
+#aiMinNum { width: 6ch; padding: 3px 6px; }
 #prState { font: inherit; font-size: 12.5px; background: var(--surface); color: var(--ink);
   border: 1px solid var(--border); border-radius: 7px; padding: 6px 8px; }
 .presets { display: inline-flex; gap: 6px; flex-wrap: wrap; }

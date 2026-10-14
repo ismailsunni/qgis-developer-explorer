@@ -91,12 +91,13 @@
       </div>
       <label class="check">✦ min. merged
         <input type="range" id="aiMin" min="1" max="200" value="10">
-        <b id="aiMinVal">10</b>
+        <input type="number" id="aiMinNum" min="1" value="10" aria-label="Minimum merged PRs for ✦">
       </label>
       <input id="search" type="search" placeholder="Search GitHub login…" aria-label="Search people">
     </div>
     <div class="scroll"><table id="peopleTable" class="data"></table></div>
     <button class="more" id="peopleMore" hidden></button>
+    <p class="note" id="aiNote"></p>
   </section>
 
   <section class="card">
