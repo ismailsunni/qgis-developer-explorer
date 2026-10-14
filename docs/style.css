@@ -142,6 +142,7 @@ input[type="range"] { width: 130px; accent-color: var(--s1); }
 
 .note { margin: 10px 0 0; color: var(--ink-2); font-size: 12.5px; }
 .note b { font-weight: 620; color: var(--ink); }
+#aiNote { margin: 0 0 10px; }
 
 .scroll { overflow-x: auto; }
 table.data { width: 100%; border-collapse: collapse; font-size: 13px; }
